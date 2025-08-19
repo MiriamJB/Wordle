@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import {View, Text, TouchableOpacity, Alert} from "react-native";
+import { getRandom5LetterWord, isValid5LetterWord } from "../components/WordManager";
 
 const WORD_LENGTH = 5;
 const MAX_TRIES = 6;
@@ -7,6 +8,11 @@ const MAX_TRIES = 6;
 export default function PlayGame() {
     const [guesses, setGuesses] = useState([]);
     const [currentGuess, setCurrentGuess] = useState("");
+    const [solution, setSolution] = useState("");
+
+    useEffect(() => {
+        setSolution(getRandom5LetterWord().toUpperCase());
+    }, []);
 
     const keyboardRows = [
         ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
@@ -26,6 +32,10 @@ export default function PlayGame() {
 
     const handleSubmit = () => {
         if (currentGuess.length === WORD_LENGTH && guesses.length < MAX_TRIES) {
+            if (!isValid5LetterWord(currentGuess)) {
+                Alert.alert("Not in word list", "Please enter a valid word.");
+                return;
+            }
             setGuesses([...guesses, currentGuess]);
             setCurrentGuess("");
         }
@@ -34,12 +44,39 @@ export default function PlayGame() {
     const handleReset = () => {
         setGuesses([]);
         setCurrentGuess("");
+        setSolution(getRandom5LetterWord().toUpperCase());
+    };
+
+    const getLetterColor = (letter, index) => {
+        if (!solution) return "#222";
+        if (solution[index] === letter) return "#22C55E"; // Green
+        if (solution.includes(letter)) return "#EAB308"; // Yellow
+        return "#374151"; // Gray
+    };
+
+    const getKeyColor = (letter) => {
+        let color = "#333";
+        guesses.forEach((guess) => {
+            if (guess.includes(letter)) {
+                guess.split("").forEach((gLetter, i) => {
+                    if (gLetter === letter) {
+                        if (solution[i] === letter) {
+                            color = "#22C55E"; // Green highest priority
+                        } else if (solution.includes(letter) && color !== "#22C55E") {
+                            color = "#EAB308"; // Yellow if not already green
+                        } else if (color === "#333") {
+                            color = "#374151"; // Gray
+                        }
+                    }
+                });
+            }
+        });
+        return color;
     };
 
     const keyStyle = {
         width: 36,
         height: 48,
-        backgroundColor: "#333",
         margin: 2,
         borderRadius: 6,
         justifyContent: "center",
@@ -62,25 +99,32 @@ export default function PlayGame() {
                     const guess = guesses[rowIndex] || (rowIndex === guesses.length ? currentGuess : "");
                     return (
                         <View key={rowIndex} style={{ flexDirection: "row", marginBottom: 6 }}>
-                            {Array.from({ length: WORD_LENGTH }).map((_, colIndex) => (
-                                <View
-                                    key={colIndex}
-                                    style={{
-                                        width: 50,
-                                        height: 50,
-                                        borderWidth: 2,
-                                        borderColor: "#444",
-                                        margin: 2,
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        backgroundColor: "#222",
-                                    }}
-                                >
-                                    <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
-                                        {guess[colIndex] || ""}
-                                    </Text>
-                                </View>
-                            ))}
+                            {Array.from({ length: WORD_LENGTH }).map((_, colIndex) => {
+                                const letter = guess[colIndex] || "";
+                                const backgroundColor =
+                                    guesses[rowIndex] && letter
+                                        ? getLetterColor(letter, colIndex)
+                                        : "#222";
+                                return (
+                                    <View
+                                        key={colIndex}
+                                        style={{
+                                            width: 50,
+                                            height: 50,
+                                            borderWidth: 2,
+                                            borderColor: "#444",
+                                            margin: 2,
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            backgroundColor,
+                                        }}
+                                    >
+                                        <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
+                                            {letter}
+                                        </Text>
+                                    </View>
+                                );
+                            })}
                         </View>
                     );
                 })}
@@ -91,7 +135,11 @@ export default function PlayGame() {
                 {keyboardRows.slice(0, 2).map((row, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: "row", justifyContent: "center", marginVertical: 4 }}>
                         {row.map((letter) => (
-                            <TouchableOpacity key={letter} onPress={() => handleKeyPress(letter)} style={keyStyle}>
+                            <TouchableOpacity
+                                key={letter}
+                                onPress={() => handleKeyPress(letter)}
+                                style={[keyStyle, { backgroundColor: getKeyColor(letter) }]}
+                            >
                                 <Text style={{ color: "white", fontSize: 16 }}>{letter}</Text>
                             </TouchableOpacity>
                         ))}
@@ -108,7 +156,11 @@ export default function PlayGame() {
                     </TouchableOpacity>
 
                     {keyboardRows[2].map((letter) => (
-                        <TouchableOpacity key={letter} onPress={() => handleKeyPress(letter)} style={keyStyle}>
+                        <TouchableOpacity
+                            key={letter}
+                            onPress={() => handleKeyPress(letter)}
+                            style={[keyStyle, { backgroundColor: getKeyColor(letter) }]}
+                        >
                             <Text style={{ color: "white", fontSize: 16 }}>{letter}</Text>
                         </TouchableOpacity>
                     ))}
