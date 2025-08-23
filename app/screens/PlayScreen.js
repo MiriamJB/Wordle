@@ -60,13 +60,14 @@ export default function PlayGame() {
     };
 
     const getLetterColor = (letter, index) => {
+        if (!solution) return styles.gray1; // Default color if solution is not set
         if (solution[index] === letter) return styles.green; // green for correct letter in the correct position
         if (solution.includes(letter)) return styles.yellow; // yellow for correct letter in the wrong position
         return styles.inactiveKeyColor; // gray for incorrect letter
     };
 
     const previousGuessGridSquare = (colIndex, letter) => {
-        const backgroundColor = getLetterColor(letter);
+        const backgroundColor = getLetterColor(letter, colIndex);
         return (
             <View
                 key={colIndex}
@@ -102,23 +103,38 @@ export default function PlayGame() {
     }
 
     const getKeyColor = (letter) => {
-        let color = "#333";
+        let keyBackgroundColor = styles.activeKeyColor;
+        let keyTextColor = styles.text.color;
         guesses.forEach((guess) => {
             if (guess.includes(letter)) {
                 guess.split("").forEach((gLetter, i) => {
                     if (gLetter === letter) {
+                        keyTextColor = styles.buttonText.color;
                         if (solution[i] === letter) {
-                            color = "#22C55E"; // Green highest priority
-                        } else if (solution.includes(letter) && color !== "#22C55E") {
-                            color = "#EAB308"; // Yellow if not already green
-                        } else if (color === "#333") {
-                            color = "#374151"; // Gray
+                            keyBackgroundColor = styles.green; // Green highest priority
+                        } else if (solution.includes(letter) && keyBackgroundColor !== styles.green) {
+                            keyBackgroundColor = styles.yellow; // Yellow if not already green
+                        } else if (keyBackgroundColor === styles.activeKeyColor) {
+                            keyBackgroundColor = styles.inactiveKeyColor; // inactive gray
                         }
                     }
                 });
             }
         });
-        return color;
+        return { backgroundColor: keyBackgroundColor, textColor: keyTextColor };
+    };
+
+    const makeKeyboardKey = (letter) => {
+        const keyColors = getKeyColor(letter);
+        return (
+            <TouchableOpacity
+                key={letter}
+                onPress={() => handleKeyPress(letter)}
+                style={[keyStyle, { backgroundColor: keyColors.backgroundColor }]}
+            >
+                <Text style={{ color: keyColors.textColor, fontSize: 16, fontWeight: 'bold' }}>{letter}</Text>
+            </TouchableOpacity>
+        );
     };
 
     const keyStyle = {
@@ -128,7 +144,7 @@ export default function PlayGame() {
         borderRadius: 6,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: '#222',
+        backgroundColor: styles.activeKeyColor,
     };
 
     return (
@@ -180,44 +196,26 @@ export default function PlayGame() {
 
             {/* Keyboard */}
             <View style={{ marginBottom: 20 }}>
+                {/*first two rows of the keyboard*/}
                 {keyboardRows.slice(0, 2).map((row, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: "row", justifyContent: "center", marginVertical: 4 }}>
-                        {row.map((letter) => (
-                            <TouchableOpacity
-                                key={letter}
-                                onPress={() => handleKeyPress(letter)}
-                                style={[keyStyle, { backgroundColor: getKeyColor(letter) }]}
-                            >
-                                <Text style={{ color: "white", fontSize: 16 }}>{letter}</Text>
-                            </TouchableOpacity>
-                        ))}
+                        {row.map((letter) => makeKeyboardKey(letter) )}
                     </View>
                 ))}
 
                 {/* Last row with Enter on left and Backspace on right */}
                 <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 4 }}>
-                    <TouchableOpacity
-                        onPress={handleSubmit}
-                        style={[keyStyle, { width: 60 }]}
-                    >
-                        <Text style={{ color: "white", fontSize: 16 }}>Enter</Text>
+                    {/*Enter key*/}
+                    <TouchableOpacity onPress={handleSubmit} style={[keyStyle, { width: 60 }]}>
+                        <Text style={{ color: styles.text.color, fontSize: 12, fontWeight: 'bold' }}>ENTER</Text>
                     </TouchableOpacity>
 
-                    {keyboardRows[2].map((letter) => (
-                        <TouchableOpacity
-                            key={letter}
-                            onPress={() => handleKeyPress(letter)}
-                            style={[keyStyle, { backgroundColor: getKeyColor(letter) }]}
-                        >
-                            <Text style={{ color: "white", fontSize: 16 }}>{letter}</Text>
-                        </TouchableOpacity>
-                    ))}
+                    {/*Last row of the keyboard*/}
+                    {keyboardRows[2].map((letter) => makeKeyboardKey(letter) )}
 
-                    <TouchableOpacity
-                        onPress={handleBackspace}
-                        style={[keyStyle, { width: 60 }]}
-                    >
-                        <MaterialCommunityIcons name="backspace" size={24} style={styles.icon} />
+                    {/*Backspace key*/}
+                    <TouchableOpacity onPress={handleBackspace} style={[keyStyle, { width: 60 }]}>
+                        <MaterialCommunityIcons name="backspace" size={22} style={styles.icon} />
                     </TouchableOpacity>
                 </View>
             </View>

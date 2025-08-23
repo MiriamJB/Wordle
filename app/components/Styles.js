@@ -16,7 +16,7 @@ export const useThemeStyles = () => {
             gray2: "#787c7e" // inactive
         },
         dark: {
-            background: '#121213',
+            background: '#161616',
             background2: '#222',
             text: '#fefffe',
             buttonText: '#fefffe',
