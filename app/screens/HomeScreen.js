@@ -7,7 +7,7 @@ export default function HomeScreen() {
     const navigation = useNavigation();
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, {justifyContent: 'center', alignItems: 'center'}]}>
             <TouchableOpacity
                 onPress={() => {navigation.navigate('Play')}}
                 style={styles.button}

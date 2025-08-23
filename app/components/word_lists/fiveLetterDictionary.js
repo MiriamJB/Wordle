@@ -16833,7 +16833,6 @@ export const fiveLetterDictionary = [
   "third",
   "thirl",
   "thirt",
-  "thisn",
   "thoft",
   "thoke",
   "thole",

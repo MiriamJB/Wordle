@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
-import {View, Text, TouchableOpacity, Alert} from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { getRandom5LetterWord, isValid5LetterWord } from "../components/WordManager";
+import {useThemeStyles} from "../components/Styles";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const WORD_LENGTH = 5;
 const MAX_TRIES = 6;
 
 export default function PlayGame() {
+    const styles = useThemeStyles();
     const [guesses, setGuesses] = useState([]);
     const [currentGuess, setCurrentGuess] = useState("");
     const [solution, setSolution] = useState("");
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
         setSolution(getRandom5LetterWord().toUpperCase());
@@ -33,13 +38,20 @@ export default function PlayGame() {
     const handleSubmit = () => {
         if (currentGuess.length === WORD_LENGTH && guesses.length < MAX_TRIES) {
             if (!isValid5LetterWord(currentGuess)) {
-                Alert.alert("Not in word list", "Please enter a valid word.");
+                setMessage("Not in word list.");
                 return;
             }
             setGuesses([...guesses, currentGuess]);
             setCurrentGuess("");
         }
     };
+
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => setMessage("") , 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [message]);
 
     const handleReset = () => {
         setGuesses([]);
@@ -48,11 +60,46 @@ export default function PlayGame() {
     };
 
     const getLetterColor = (letter, index) => {
-        if (!solution) return "#222";
-        if (solution[index] === letter) return "#22C55E"; // Green
-        if (solution.includes(letter)) return "#EAB308"; // Yellow
-        return "#374151"; // Gray
+        if (solution[index] === letter) return styles.green; // green for correct letter in the correct position
+        if (solution.includes(letter)) return styles.yellow; // yellow for correct letter in the wrong position
+        return styles.inactiveKeyColor; // gray for incorrect letter
     };
+
+    const previousGuessGridSquare = (colIndex, letter) => {
+        const backgroundColor = getLetterColor(letter);
+        return (
+            <View
+                key={colIndex}
+                style={[ styles.guessGridSquare, { backgroundColor, borderColor: backgroundColor } ]}
+            >
+                <Text style={{ color: styles.buttonText.color, fontSize: 24, fontWeight: "bold" }}>
+                    {letter}
+                </Text>
+            </View>
+        );
+    }
+
+    const currentGuessGridSquare = (colIndex, letter) => {
+        return (
+            <View
+                key={colIndex}
+                style={[ styles.guessGridSquare, { borderColor: styles.gray2 } ]}
+            >
+                <Text style={{ color: styles.text.color, fontSize: 24, fontWeight: "bold" }}>
+                    {letter}
+                </Text>
+            </View>
+        );
+    }
+
+    const futureGuessGridSquare = (colIndex) => {
+        return (
+            <View
+                key={colIndex}
+                style={[ styles.guessGridSquare, { borderColor: styles.gray1 } ]}
+            />
+        );
+    }
 
     const getKeyColor = (letter) => {
         let color = "#333";
@@ -81,17 +128,34 @@ export default function PlayGame() {
         borderRadius: 6,
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: '#222',
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: "#111", padding: 16 }}>
+        <View style={styles.container}>
             {/* Header */}
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>Wordle</Text>
+            <View style={{flexDirection: "row", justifyContent: "space-between" }}>
+                <View style={{ flexDirection: "row"}}>
+                    <TouchableOpacity>
+                        <MaterialCommunityIcons name="lightbulb" size={styles.icon.size} style={styles.icon} />
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                        <FontAwesome name="question-circle" size={styles.icon.size} style={styles.icon} />
+                    </TouchableOpacity>
+                </View>
                 <TouchableOpacity onPress={handleReset}>
-                    <Text style={{ color: "#4ADE80", fontSize: 16 }}>Reset</Text>
+                    <MaterialCommunityIcons name="restore" size={styles.icon.size} style={styles.icon} />
                 </TouchableOpacity>
             </View>
+
+            {/* Error message */}
+            {message ? (
+                <View style={{ position: "absolute", top: 70, left: 0, right: 0, zIndex: 10, alignItems: "center" }} pointerEvents="none">
+                    <View style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: styles.background2, borderRadius: 6, maxWidth: 300 }}>
+                        <Text style={[styles.text, { textAlign: 'center' }]}>{message}</Text>
+                    </View>
+                </View>
+            ) : null}
 
             {/* Guess Grid */}
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -101,29 +165,13 @@ export default function PlayGame() {
                         <View key={rowIndex} style={{ flexDirection: "row", marginBottom: 6 }}>
                             {Array.from({ length: WORD_LENGTH }).map((_, colIndex) => {
                                 const letter = guess[colIndex] || "";
-                                const backgroundColor =
-                                    guesses[rowIndex] && letter
-                                        ? getLetterColor(letter, colIndex)
-                                        : "#222";
-                                return (
-                                    <View
-                                        key={colIndex}
-                                        style={{
-                                            width: 50,
-                                            height: 50,
-                                            borderWidth: 2,
-                                            borderColor: "#444",
-                                            margin: 2,
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            backgroundColor,
-                                        }}
-                                    >
-                                        <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
-                                            {letter}
-                                        </Text>
-                                    </View>
-                                );
+                                if (rowIndex < guesses.length) { // Previous guesses
+                                    return previousGuessGridSquare(colIndex, letter);
+                                } else if (rowIndex === guesses.length) { // Current guess
+                                    return currentGuessGridSquare(colIndex, letter);
+                                } else { // Future guesses
+                                    return futureGuessGridSquare(colIndex);
+                                }
                             })}
                         </View>
                     );
@@ -150,7 +198,7 @@ export default function PlayGame() {
                 <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 4 }}>
                     <TouchableOpacity
                         onPress={handleSubmit}
-                        style={[keyStyle, { backgroundColor: "#4ADE80", width: 60 }]}
+                        style={[keyStyle, { width: 60 }]}
                     >
                         <Text style={{ color: "white", fontSize: 16 }}>Enter</Text>
                     </TouchableOpacity>
@@ -167,9 +215,9 @@ export default function PlayGame() {
 
                     <TouchableOpacity
                         onPress={handleBackspace}
-                        style={[keyStyle, { backgroundColor: "#F87171", width: 60 }]}
+                        style={[keyStyle, { width: 60 }]}
                     >
-                        <Text style={{ color: "white", fontSize: 16 }}>⌫</Text>
+                        <MaterialCommunityIcons name="backspace" size={24} style={styles.icon} />
                     </TouchableOpacity>
                 </View>
             </View>
