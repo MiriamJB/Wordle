@@ -1,6 +1,7 @@
-import {Text, TouchableOpacity, View} from 'react-native';
+import {Text, View} from 'react-native';
 import {useNavigation} from "@react-navigation/native";
 import {useThemeStyles} from "../components/Styles";
+import {VibrateTouchableOpacity} from "../components/VibrateTouchableOpacity";
 
 export default function HomeScreen() {
     const styles = useThemeStyles();
@@ -8,12 +9,12 @@ export default function HomeScreen() {
 
     return (
         <View style={[styles.container, {justifyContent: 'center', alignItems: 'center'}]}>
-            <TouchableOpacity
+            <VibrateTouchableOpacity
                 onPress={() => {navigation.navigate('Play')}}
                 style={styles.button}
             >
                 <Text style={styles.buttonText}>Play Game</Text>
-            </TouchableOpacity>
+            </VibrateTouchableOpacity>
         </View>
     );
 }

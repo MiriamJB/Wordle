@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { getRandom5LetterWord, isValid5LetterWord } from "../components/WordManager";
-import {useThemeStyles} from "../components/Styles";
+import { View, Text } from "react-native";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useThemeStyles} from "../components/Styles";
+import { getRandom5LetterWord, isValid5LetterWord } from "../components/WordManager";
+import {VibrateTouchableOpacity} from "../components/VibrateTouchableOpacity";
 
 const WORD_LENGTH = 5;
 const MAX_TRIES = 6;
@@ -127,13 +128,13 @@ export default function PlayGame() {
     const makeKeyboardKey = (letter) => {
         const keyColors = getKeyColor(letter);
         return (
-            <TouchableOpacity
+            <VibrateTouchableOpacity
                 key={letter}
                 onPress={() => handleKeyPress(letter)}
                 style={[keyStyle, { backgroundColor: keyColors.backgroundColor }]}
             >
                 <Text style={{ color: keyColors.textColor, fontSize: 16, fontWeight: 'bold' }}>{letter}</Text>
-            </TouchableOpacity>
+            </VibrateTouchableOpacity>
         );
     };
 
@@ -152,16 +153,16 @@ export default function PlayGame() {
             {/* Header */}
             <View style={{flexDirection: "row", justifyContent: "space-between" }}>
                 <View style={{ flexDirection: "row"}}>
-                    <TouchableOpacity>
+                    <VibrateTouchableOpacity>
                         <MaterialCommunityIcons name="lightbulb" size={styles.icon.size} style={styles.icon} />
-                    </TouchableOpacity>
-                    <TouchableOpacity>
+                    </VibrateTouchableOpacity>
+                    <VibrateTouchableOpacity>
                         <FontAwesome name="question-circle" size={styles.icon.size} style={styles.icon} />
-                    </TouchableOpacity>
+                    </VibrateTouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={handleReset}>
+                <VibrateTouchableOpacity onPress={handleReset}>
                     <MaterialCommunityIcons name="restore" size={styles.icon.size} style={styles.icon} />
-                </TouchableOpacity>
+                </VibrateTouchableOpacity>
             </View>
 
             {/* Error message */}
@@ -206,17 +207,17 @@ export default function PlayGame() {
                 {/* Last row with Enter on left and Backspace on right */}
                 <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 4 }}>
                     {/*Enter key*/}
-                    <TouchableOpacity onPress={handleSubmit} style={[keyStyle, { width: 60 }]}>
+                    <VibrateTouchableOpacity onPress={handleSubmit} style={[keyStyle, { width: 60 }]}>
                         <Text style={{ color: styles.text.color, fontSize: 12, fontWeight: 'bold' }}>ENTER</Text>
-                    </TouchableOpacity>
+                    </VibrateTouchableOpacity>
 
                     {/*Last row of the keyboard*/}
                     {keyboardRows[2].map((letter) => makeKeyboardKey(letter) )}
 
                     {/*Backspace key*/}
-                    <TouchableOpacity onPress={handleBackspace} style={[keyStyle, { width: 60 }]}>
+                    <VibrateTouchableOpacity onPress={handleBackspace} style={[keyStyle, { width: 60 }]}>
                         <MaterialCommunityIcons name="backspace" size={22} style={styles.icon} />
-                    </TouchableOpacity>
+                    </VibrateTouchableOpacity>
                 </View>
             </View>
         </View>
