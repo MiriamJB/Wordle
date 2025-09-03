@@ -37,13 +37,32 @@ export const useThemeStyles = () => {
             color: colors[colorScheme].text,
         },
         button: {
-            backgroundColor: colors[colorScheme].accent1,
             padding: 10,
             borderRadius: 5,
+            alignItems: "center",
+            borderColor: colors[colorScheme].gray2,
+            borderWidth: 1,
+            borderBottomWidth: 3,
+            borderRightWidth: 2,
+        },
+        accentButton: {
+            // Gradient background will be applied via LinearGradient wrapper
+            padding: 10,
+            borderRadius: 5,
+            alignItems: "center",
+            overflow: "hidden",
         },
         buttonText: {
+            color: colors[colorScheme].text,
+            fontSize: 18,
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+        },
+        accentButtonText: {
             color: colors[colorScheme].buttonText,
             fontSize: 18,
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
         },
         icon: {
             margin: 5,

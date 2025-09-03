@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { View, Text } from "react-native";
+import {useNavigation} from "@react-navigation/native";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useThemeStyles} from "../components/Styles";
 import { getRandom5LetterWord, isValid5LetterWord } from "../components/WordManager";
 import {VibrateTouchableOpacity} from "../components/VibrateTouchableOpacity";
+import GameEndPopup from "../components/GameEndPopup";
 
 const WORD_LENGTH = 5;
 const MAX_TRIES = 6;
 
 export default function PlayGame() {
     const styles = useThemeStyles();
+    const navigation = useNavigation();
     const [guesses, setGuesses] = useState([]);
     const [currentGuess, setCurrentGuess] = useState("");
     const [solution, setSolution] = useState("");
     const [message, setMessage] = useState("");
+    const [win, setWin] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
 
     useEffect(() => {
         setSolution(getRandom5LetterWord().toUpperCase());
@@ -43,7 +48,15 @@ export default function PlayGame() {
                 return;
             }
             setGuesses([...guesses, currentGuess]);
+            if (currentGuess === solution) {
+                setWin(true);
+                setShowPopup(true);
+            }
             setCurrentGuess("");
+        }
+        if (guesses.length >= MAX_TRIES -1 && currentGuess !== solution) {
+            setWin(false);
+            setShowPopup(true);
         }
     };
 
@@ -58,6 +71,8 @@ export default function PlayGame() {
         setGuesses([]);
         setCurrentGuess("");
         setSolution(getRandom5LetterWord().toUpperCase());
+        setWin(false);
+        setShowPopup(false);
     };
 
     const getLetterColor = (letter, index) => {
@@ -148,8 +163,26 @@ export default function PlayGame() {
         backgroundColor: styles.activeKeyColor,
     };
 
+    const closePopup = (action) => {
+        setShowPopup(false);
+        if (action === 'play again') {
+            handleReset();
+        } else if (action === 'home') {
+            navigation.navigate('Home');
+        }
+    }
+
     return (
         <View style={styles.container}>
+            {/* Win/lose popup after game is finished */}
+            <GameEndPopup
+                visible={showPopup}
+                onClose={closePopup}
+                solution={solution}
+                numberOfGuesses={guesses.length}
+                win={win}
+            />
+
             {/* Header */}
             <View style={{flexDirection: "row", justifyContent: "space-between" }}>
                 <View style={{ flexDirection: "row"}}>
