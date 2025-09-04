@@ -3,7 +3,7 @@ import {Modal, View, Text, StyleSheet} from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {VibrateTouchableOpacity} from "./VibrateTouchableOpacity";
 import {useThemeStyles} from "./Styles";
-import {Gradient} from "./Gradient";
+import {BasicButton, GradientButton} from "./Buttons";
 
 export default function GameEndPopup({visible, onClose, solution, numberOfGuesses, win}) {
     const styles = useThemeStyles();
@@ -26,39 +26,38 @@ export default function GameEndPopup({visible, onClose, solution, numberOfGuesse
             <View style={popupStyles.overlay}>
                 <View style={popupStyles.popup}>
                     <VibrateTouchableOpacity style={popupStyles.closeButton} onPress={() => onClose('close')}>
-                        <MaterialCommunityIcons name="window-close" size={styles.icon.size} style={styles.icon} />
+                        <MaterialCommunityIcons name="window-close" size={styles.icon.size} style={styles.icon}/>
                     </VibrateTouchableOpacity>
                     <View style={{alignItems: "center"}}>
-                        { win === true ? <>
+                        {win === true ? <>
                             <Text style={popupStyles.title}>{shoutOut[numberOfGuesses - 1]}</Text>
-                            <Text style={popupStyles.message}>You guessed {solution} in {numberOfGuesses} {numberOfGuesses === 1 ? "try" : "tries"}</Text>
-                        </> : answerRevealed === false ? <>
+                            <Text style={popupStyles.message}>You guessed {solution} in {numberOfGuesses}
+                                {numberOfGuesses === 1 ? "try" : "tries"}</Text>
+                        </> : !answerRevealed ? <>
                             <Text style={popupStyles.title}>Almost!</Text>
                             <Text style={popupStyles.message}>Get another 2 guesses to keep trying!</Text>
                         </> : <>
                             <Text style={popupStyles.title}>{solution}</Text>
                             <Text style={popupStyles.message}>was the answer. Better luck next time!</Text>
-                        </> }
+                        </>}
                     </View>
                     <View style={{flexDirection: "column", gap: 10}}>
-                        { win === false && answerRevealed === false ? <>
-                            <VibrateTouchableOpacity onPress={() => onClose('more guesses')} style={{borderRadius: 5, overflow: 'hidden'}}>
-                                <Gradient>
-                                    <Text style={styles.accentButtonText}>+2 Guesses</Text>
-                                    <Text style={styles.accentButtonText}>10 C</Text>
-                                </Gradient>
-                            </VibrateTouchableOpacity>
-                            <VibrateTouchableOpacity style={styles.button} onPress={() => setAnswerRevealed(true)}>
-                                <Text style={styles.accentButtonText}>Reveal Answer</Text>
-                            </VibrateTouchableOpacity>
+                        {!win && !answerRevealed ? <>
+                            <GradientButton onPress={() => onClose('more guesses')}>
+                                    <Text>+2 Guesses</Text>
+                                    <Text>10 C</Text>
+                            </GradientButton>
+                            <BasicButton onPress={() => setAnswerRevealed(true)}>
+                                <Text>Reveal Answer</Text>
+                            </BasicButton>
                         </> : <>
-                            <VibrateTouchableOpacity style={styles.button} onPress={() => onCloseWrapper('play again')}>
-                                <Text style={styles.buttonText}>Play Again</Text>
-                            </VibrateTouchableOpacity>
-                            <VibrateTouchableOpacity style={styles.button} onPress={() => onCloseWrapper('home')}>
-                                <Text style={styles.buttonText}>Home</Text>
-                            </VibrateTouchableOpacity>
-                        </> }
+                            <BasicButton onPress={() => onCloseWrapper('play again')}>
+                                <Text>Play Again</Text>
+                            </BasicButton>
+                            <BasicButton onPress={() => onCloseWrapper('home')}>
+                                <Text>Home</Text>
+                            </BasicButton>
+                        </>}
                     </View>
                 </View>
             </View>

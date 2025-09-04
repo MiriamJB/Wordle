@@ -1,7 +1,7 @@
 import {Text, View} from 'react-native';
 import {useNavigation} from "@react-navigation/native";
 import {useThemeStyles} from "../components/Styles";
-import {VibrateTouchableOpacity} from "../components/VibrateTouchableOpacity";
+import {BasicButton} from "../components/Buttons";
 
 export default function HomeScreen() {
     const styles = useThemeStyles();
@@ -9,12 +9,9 @@ export default function HomeScreen() {
 
     return (
         <View style={[styles.container, {justifyContent: 'center', alignItems: 'center'}]}>
-            <VibrateTouchableOpacity
-                onPress={() => {navigation.navigate('Play')}}
-                style={styles.button}
-            >
-                <Text style={styles.buttonText}>Play Game</Text>
-            </VibrateTouchableOpacity>
+            <BasicButton onPress={() => {navigation.navigate('Play')}}>
+                <Text>Play Game</Text>
+            </BasicButton>
         </View>
     );
 }
