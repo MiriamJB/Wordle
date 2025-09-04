@@ -84,6 +84,7 @@ export const useThemeStyles = () => {
         gray2: colors[colorScheme].gray2,
         activeKeyColor: colorScheme === 'dark' ? colors.dark.gray2 : colors.light.gray1,
         inactiveKeyColor: colorScheme === 'dark' ? colors.dark.gray1 : colors.light.gray2,
+        background: colors[colorScheme].background,
         background2: colors[colorScheme].background2,
     })
 }

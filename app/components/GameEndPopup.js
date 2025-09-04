@@ -1,13 +1,14 @@
 import React from "react";
-import {Modal, View, Text, StyleSheet} from "react-native";
+import {Modal, View, Text, StyleSheet, useColorScheme} from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {VibrateTouchableOpacity} from "./VibrateTouchableOpacity";
 import {useThemeStyles} from "./Styles";
 import {BasicButton, GradientButton} from "./Buttons";
 
 export default function GameEndPopup({visible, onClose, solution, numberOfGuesses, win}) {
+    const colorScheme = useColorScheme();
     const styles = useThemeStyles();
-    const popupStyles = usePopupStyles(styles);
+    const popupStyles = usePopupStyles(colorScheme, styles);
     const [answerRevealed, setAnswerRevealed] = React.useState(false);
     const shoutOut = ["Impossible!", "Genius!", "Excellent!", "Impressive!", "Great!", "Phew!", "Almost!"];
 
@@ -65,7 +66,7 @@ export default function GameEndPopup({visible, onClose, solution, numberOfGuesse
     );
 }
 
-const usePopupStyles = (styles) => {
+const usePopupStyles = (colorScheme, styles) => {
     return StyleSheet.create({
         overlay: {
             flex: 1,
@@ -74,7 +75,7 @@ const usePopupStyles = (styles) => {
             alignItems: "center",
         },
         popup: {
-            backgroundColor: styles.background2,
+            backgroundColor: colorScheme === 'dark' ? styles.background2 : styles.background,
             borderRadius: 10,
             padding: 30,
             elevation: 5,

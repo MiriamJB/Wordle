@@ -89,7 +89,7 @@ export default function PlayGame() {
                 key={colIndex}
                 style={[ styles.guessGridSquare, { backgroundColor, borderColor: backgroundColor } ]}
             >
-                <Text style={{ color: styles.buttonText.color, fontSize: 24, fontWeight: "bold" }}>
+                <Text style={{ color: styles.accentButtonText.color, fontSize: 24, fontWeight: "bold" }}>
                     {letter}
                 </Text>
             </View>
@@ -120,12 +120,12 @@ export default function PlayGame() {
 
     const getKeyColor = (letter) => {
         let keyBackgroundColor = styles.activeKeyColor;
-        let keyTextColor = styles.text.color;
+        let keyTextColor = styles.buttonText.color;
         guesses.forEach((guess) => {
             if (guess.includes(letter)) {
                 guess.split("").forEach((gLetter, i) => {
                     if (gLetter === letter) {
-                        keyTextColor = styles.buttonText.color;
+                        keyTextColor = styles.accentButtonText.color;
                         if (solution[i] === letter) {
                             keyBackgroundColor = styles.green; // Green highest priority
                         } else if (solution.includes(letter) && keyBackgroundColor !== styles.green) {
