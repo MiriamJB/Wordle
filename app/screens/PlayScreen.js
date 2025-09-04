@@ -147,6 +147,7 @@ export default function PlayGame() {
                 key={letter}
                 onPress={() => handleKeyPress(letter)}
                 style={[keyStyle, { backgroundColor: keyColors.backgroundColor }]}
+                disabled={win}
             >
                 <Text style={{ color: keyColors.textColor, fontSize: 16, fontWeight: 'bold' }}>{letter}</Text>
             </VibrateTouchableOpacity>
@@ -217,7 +218,7 @@ export default function PlayGame() {
                                 const letter = guess[colIndex] || "";
                                 if (rowIndex < guesses.length) { // Previous guesses
                                     return previousGuessGridSquare(colIndex, letter);
-                                } else if (rowIndex === guesses.length) { // Current guess
+                                } else if (rowIndex === guesses.length && !win) { // Current guess
                                     return currentGuessGridSquare(colIndex, letter);
                                 } else { // Future guesses
                                     return futureGuessGridSquare(colIndex);
@@ -240,7 +241,7 @@ export default function PlayGame() {
                 {/* Last row with Enter on left and Backspace on right */}
                 <View style={{ flexDirection: "row", justifyContent: "center", marginVertical: 4 }}>
                     {/*Enter key*/}
-                    <VibrateTouchableOpacity onPress={handleSubmit} style={[keyStyle, { width: 60 }]}>
+                    <VibrateTouchableOpacity onPress={handleSubmit} style={[keyStyle, { width: 60 }]} disabled={win}>
                         <Text style={{ color: styles.text.color, fontSize: 12, fontWeight: 'bold' }}>ENTER</Text>
                     </VibrateTouchableOpacity>
 
@@ -248,7 +249,7 @@ export default function PlayGame() {
                     {keyboardRows[2].map((letter) => makeKeyboardKey(letter) )}
 
                     {/*Backspace key*/}
-                    <VibrateTouchableOpacity onPress={handleBackspace} style={[keyStyle, { width: 60 }]}>
+                    <VibrateTouchableOpacity onPress={handleBackspace} style={[keyStyle, { width: 60 }]} disabled={win}>
                         <MaterialCommunityIcons name="backspace" size={22} style={styles.icon} />
                     </VibrateTouchableOpacity>
                 </View>

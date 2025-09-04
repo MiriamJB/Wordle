@@ -1,17 +1,14 @@
 import {Platform, TouchableOpacity, Vibration} from "react-native";
 import {useState} from "react";
 
-export const VibrateTouchableOpacity = ({ onPress, style, children }) => {
+export const VibrateTouchableOpacity = ({ onPress, style, children, disabled }) => {
     const [pressTime, setPressTime] = useState(null);
 
     const handlePressIn = () => {
-        // Vibrate for 50 milliseconds
         if (Platform.OS === 'ios') {
-            // iOS vibration duration is fixed, so we just call it
-            Vibration.vibrate();
+            Vibration.vibrate(); // iOS vibration duration is fixed, so we just call it
         } else {
-            // Android allows custom duration
-            Vibration.vibrate(1);
+            Vibration.vibrate(1); // Android allows custom duration
             setPressTime(Date.now());
         }
     };
@@ -25,7 +22,13 @@ export const VibrateTouchableOpacity = ({ onPress, style, children }) => {
     }
 
     return (
-        <TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} onPress={onPress} style={style}>
+        <TouchableOpacity
+            onPress={onPress}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            disabled={disabled}
+            style={style}
+        >
             {children}
         </TouchableOpacity>
     );

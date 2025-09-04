@@ -1,9 +1,8 @@
 import React from "react";
-import {Modal, View, Text, StyleSheet, useColorScheme} from "react-native";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {VibrateTouchableOpacity} from "./VibrateTouchableOpacity";
+import {View, Text, StyleSheet, useColorScheme} from "react-native";
 import {useThemeStyles} from "./Styles";
 import {BasicButton, GradientButton} from "./Buttons";
+import Popup from "./Popup";
 
 export default function GameEndPopup({visible, onClose, solution, numberOfGuesses, win}) {
     const colorScheme = useColorScheme();
@@ -18,76 +17,45 @@ export default function GameEndPopup({visible, onClose, solution, numberOfGuesse
     }
 
     return (
-        <Modal
-            transparent={true}
-            animationType="fade"
-            visible={visible}
-            onRequestClose={onClose}
-        >
-            <View style={popupStyles.overlay}>
-                <View style={popupStyles.popup}>
-                    <VibrateTouchableOpacity style={popupStyles.closeButton} onPress={() => onClose('close')}>
-                        <MaterialCommunityIcons name="window-close" size={styles.icon.size} style={styles.icon}/>
-                    </VibrateTouchableOpacity>
-                    <View style={{alignItems: "center"}}>
-                        {win === true ? <>
-                            <Text style={popupStyles.title}>{shoutOut[numberOfGuesses - 1]}</Text>
-                            <Text style={popupStyles.message}>You guessed {solution} in {numberOfGuesses}
-                                {numberOfGuesses === 1 ? "try" : "tries"}</Text>
-                        </> : !answerRevealed ? <>
-                            <Text style={popupStyles.title}>Almost!</Text>
-                            <Text style={popupStyles.message}>Get another 2 guesses to keep trying!</Text>
-                        </> : <>
-                            <Text style={popupStyles.title}>{solution}</Text>
-                            <Text style={popupStyles.message}>was the answer. Better luck next time!</Text>
-                        </>}
-                    </View>
-                    <View style={{flexDirection: "column", gap: 10}}>
-                        {!win && !answerRevealed ? <>
-                            <GradientButton onPress={() => onClose('more guesses')}>
-                                    <Text>+2 Guesses</Text>
-                                    <Text>10 C</Text>
-                            </GradientButton>
-                            <BasicButton onPress={() => setAnswerRevealed(true)}>
-                                <Text>Reveal Answer</Text>
-                            </BasicButton>
-                        </> : <>
-                            <BasicButton onPress={() => onCloseWrapper('play again')}>
-                                <Text>Play Again</Text>
-                            </BasicButton>
-                            <BasicButton onPress={() => onCloseWrapper('home')}>
-                                <Text>Home</Text>
-                            </BasicButton>
-                        </>}
-                    </View>
-                </View>
+        <Popup visible={visible} onClose={() => onClose('close')}>
+            <View style={{alignItems: "center"}}>
+                {win === true ? <>
+                    <Text style={popupStyles.title}>{shoutOut[numberOfGuesses - 1]}</Text>
+                    <Text style={popupStyles.message}>
+                        You guessed {solution} in {numberOfGuesses} {numberOfGuesses === 1 ? "try" : "tries"}
+                    </Text>
+                </> : !answerRevealed ? <>
+                    <Text style={popupStyles.title}>Almost!</Text>
+                    <Text style={popupStyles.message}>Get another 2 guesses to keep trying!</Text>
+                </> : <>
+                    <Text style={popupStyles.title}>{solution}</Text>
+                    <Text style={popupStyles.message}>was the answer. Better luck next time!</Text>
+                </>}
             </View>
-        </Modal>
+            <View style={{flexDirection: "column", gap: 10}}>
+                {!win && !answerRevealed ? <>
+                    <GradientButton onPress={() => onClose('more guesses')}>
+                        <Text>+2 Guesses</Text>
+                        <Text>10 C</Text>
+                    </GradientButton>
+                    <BasicButton onPress={() => setAnswerRevealed(true)}>
+                        <Text>Reveal Answer</Text>
+                    </BasicButton>
+                </> : <>
+                    <BasicButton onPress={() => onCloseWrapper('play again')}>
+                        <Text>Play Again</Text>
+                    </BasicButton>
+                    <BasicButton onPress={() => onCloseWrapper('home')}>
+                        <Text>Home</Text>
+                    </BasicButton>
+                </>}
+            </View>
+        </Popup>
     );
 }
 
 const usePopupStyles = (colorScheme, styles) => {
     return StyleSheet.create({
-        overlay: {
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            justifyContent: "center",
-            alignItems: "center",
-        },
-        popup: {
-            backgroundColor: colorScheme === 'dark' ? styles.background2 : styles.background,
-            borderRadius: 10,
-            padding: 30,
-            elevation: 5,
-            position: "relative",
-        },
-        closeButton: {
-            position: "absolute",
-            top: 10,
-            right: 10,
-            zIndex: 10,
-            padding: 5,
-        },
         title: {
             fontSize: 22,
             fontWeight: "bold",
