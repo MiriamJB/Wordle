@@ -1,19 +1,23 @@
 import React from "react";
-import {View, Text, StyleSheet, useColorScheme} from "react-native";
-import {useThemeStyles} from "./Styles";
-import {BasicButton, GradientButton} from "./Buttons";
-import Popup from "./Popup";
+import {View, Text, Linking} from "react-native";
+import {useThemeStyles} from "../Styles";
+import {BasicButton, GradientButton} from "../Buttons";
+import Popup, {usePopupStyles} from "./Popup";
 
 export default function GameEndPopup({visible, onClose, solution, numberOfGuesses, win}) {
-    const colorScheme = useColorScheme();
     const styles = useThemeStyles();
-    const popupStyles = usePopupStyles(colorScheme, styles);
+    const popupStyles = usePopupStyles(styles);
     const [answerRevealed, setAnswerRevealed] = React.useState(false);
     const shoutOut = ["Impossible!", "Genius!", "Excellent!", "Impressive!", "Great!", "Phew!", "Almost!"];
 
     const onCloseWrapper = (action) => {
         setAnswerRevealed(false);
         onClose(action);
+    }
+
+    const defineWord = () => {
+        const url = `https://www.google.com/search?q=define%20${solution}#ebo=0`;
+        Linking.openURL(url).catch(err => console.error("Failed to open URL:", err));
     }
 
     return (
@@ -32,7 +36,7 @@ export default function GameEndPopup({visible, onClose, solution, numberOfGuesse
                     <Text style={popupStyles.message}>was the answer. Better luck next time!</Text>
                 </>}
             </View>
-            <View style={{flexDirection: "column", gap: 10}}>
+            <View style={popupStyles.buttonContainer}>
                 {!win && !answerRevealed ? <>
                     <GradientButton onPress={() => onClose('more guesses')}>
                         <Text>+2 Guesses</Text>
@@ -45,6 +49,9 @@ export default function GameEndPopup({visible, onClose, solution, numberOfGuesse
                     <BasicButton onPress={() => onCloseWrapper('play again')}>
                         <Text>Play Again</Text>
                     </BasicButton>
+                    <BasicButton onPress={() => defineWord()}>
+                        <Text>Define {solution}</Text>
+                    </BasicButton>
                     <BasicButton onPress={() => onCloseWrapper('home')}>
                         <Text>Home</Text>
                     </BasicButton>
@@ -52,20 +59,4 @@ export default function GameEndPopup({visible, onClose, solution, numberOfGuesse
             </View>
         </Popup>
     );
-}
-
-const usePopupStyles = (colorScheme, styles) => {
-    return StyleSheet.create({
-        title: {
-            fontSize: 22,
-            fontWeight: "bold",
-            marginBottom: 10,
-            color: styles.text.color,
-        },
-        message: {
-            fontSize: 16,
-            marginBottom: 20,
-            color: styles.text.color,
-        },
-    });
 }

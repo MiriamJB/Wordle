@@ -1,13 +1,13 @@
 import React from "react";
 import {Modal, View, StyleSheet, useColorScheme} from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {VibrateTouchableOpacity} from "./VibrateTouchableOpacity";
-import {useThemeStyles} from "./Styles";
+import {VibrateTouchableOpacity} from "../VibrateTouchableOpacity";
+import {useThemeStyles} from "../Styles";
 
 export default function Popup({visible, onClose, children}) {
     const colorScheme = useColorScheme();
     const styles = useThemeStyles();
-    const popupStyles = usePopupStyles(colorScheme, styles);
+    const popupStyles = useInternalPopupStyles(colorScheme, styles);
 
     return (
         <Modal
@@ -28,7 +28,7 @@ export default function Popup({visible, onClose, children}) {
     );
 }
 
-const usePopupStyles = (colorScheme, styles) => {
+const useInternalPopupStyles = (colorScheme, styles) => {
     return StyleSheet.create({
         overlay: {
             flex: 1,
@@ -40,6 +40,7 @@ const usePopupStyles = (colorScheme, styles) => {
             backgroundColor: colorScheme === 'dark' ? styles.background2 : styles.background,
             borderRadius: 10,
             padding: 30,
+            margin: 20,
             elevation: 5,
             position: "relative",
         },
@@ -50,5 +51,25 @@ const usePopupStyles = (colorScheme, styles) => {
             zIndex: 10,
             padding: 5,
         },
+    });
+}
+
+export const usePopupStyles = (styles) => {
+    return StyleSheet.create({
+        title: {
+            fontSize: 22,
+            fontWeight: "bold",
+            marginBottom: 10,
+            color: styles.text.color,
+        },
+        message: {
+            fontSize: 16,
+            marginBottom: 20,
+            color: styles.text.color,
+        },
+        buttonContainer: {
+            flexDirection: "column",
+            gap: 10,
+        }
     });
 }

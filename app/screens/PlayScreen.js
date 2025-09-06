@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text } from "react-native";
+import {View, Text, TouchableOpacity} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useThemeStyles} from "../components/Styles";
 import { getRandom5LetterWord, isValid5LetterWord } from "../components/WordManager";
-import {VibrateTouchableOpacity} from "../components/VibrateTouchableOpacity";
-import GameEndPopup from "../components/GameEndPopup";
+import { VibrateTouchableOpacity } from '../components/VibrateTouchableOpacity';
+import GameEndPopup from "../components/popups/GameEndPopup";
+import ResetGamePopup from "../components/popups/ResetGamePopup";
 
 const WORD_LENGTH = 5;
 const MAX_TRIES = 6;
@@ -19,7 +20,8 @@ export default function PlayGame() {
     const [solution, setSolution] = useState("");
     const [message, setMessage] = useState("");
     const [win, setWin] = useState(false);
-    const [showPopup, setShowPopup] = useState(false);
+    const [showGameEndPopup, setShowGameEndPopup] = useState(false);
+    const [showResetPopup, setShowResetPopup] = useState(false);
 
     useEffect(() => {
         setSolution(getRandom5LetterWord().toUpperCase());
@@ -50,13 +52,13 @@ export default function PlayGame() {
             setGuesses([...guesses, currentGuess]);
             if (currentGuess === solution) {
                 setWin(true);
-                setShowPopup(true);
+                setShowGameEndPopup(true);
             }
             setCurrentGuess("");
         }
         if (guesses.length >= MAX_TRIES -1 && currentGuess !== solution) {
             setWin(false);
-            setShowPopup(true);
+            setShowGameEndPopup(true);
         }
     };
 
@@ -72,7 +74,7 @@ export default function PlayGame() {
         setCurrentGuess("");
         setSolution(getRandom5LetterWord().toUpperCase());
         setWin(false);
-        setShowPopup(false);
+        setShowGameEndPopup(false);
     };
 
     const getLetterColor = (letter, index) => {
@@ -165,7 +167,7 @@ export default function PlayGame() {
     };
 
     const closePopup = (action) => {
-        setShowPopup(false);
+        setShowGameEndPopup(false);
         if (action === 'play again') {
             handleReset();
         } else if (action === 'home') {
@@ -177,11 +179,20 @@ export default function PlayGame() {
         <View style={styles.container}>
             {/* Win/lose popup after game is finished */}
             <GameEndPopup
-                visible={showPopup}
+                visible={showGameEndPopup}
                 onClose={closePopup}
                 solution={solution}
                 numberOfGuesses={guesses.length}
                 win={win}
+            />
+
+            {/* Reset game warning popup */}
+            <ResetGamePopup
+                visible={showResetPopup}
+                onClose={(action) => {
+                    setShowResetPopup(false);
+                    if (action === 'reset') handleReset();
+                }}
             />
 
             {/* Header */}
@@ -194,7 +205,7 @@ export default function PlayGame() {
                         <FontAwesome name="question-circle" size={styles.icon.size} style={styles.icon} />
                     </VibrateTouchableOpacity>
                 </View>
-                <VibrateTouchableOpacity onPress={handleReset}>
+                <VibrateTouchableOpacity onPress={() => setShowResetPopup(true)}>
                     <MaterialCommunityIcons name="restore" size={styles.icon.size} style={styles.icon} />
                 </VibrateTouchableOpacity>
             </View>
