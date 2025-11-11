@@ -151486,7 +151486,6 @@ export const dictionary = [
     "gladstonian",
     "gladstonianism",
     "gladwin",
-    "glady",
     "gladys",
     "glaga",
     "glagah",

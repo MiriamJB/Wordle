@@ -8606,7 +8606,6 @@ export const fiveLetterDictionary = [
   "glack",
   "glade",
   "glads",
-  "glady",
   "glaga",
   "glaik",
   "glair",

@@ -1,31 +1,24 @@
 import React, { useState, useEffect } from "react";
-import {View, Text, TouchableOpacity} from "react-native";
+import {View, Text} from "react-native";
 import {useNavigation} from "@react-navigation/native";
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons'
 import {useThemeStyles} from "../components/Styles";
 import { getRandom5LetterWord, isValid5LetterWord } from "../components/WordManager";
 import { VibrateTouchableOpacity } from '../components/VibrateTouchableOpacity';
 import GameEndPopup from "../components/popups/GameEndPopup";
 import ResetGamePopup from "../components/popups/ResetGamePopup";
-
-const WORD_LENGTH = 5;
-const MAX_TRIES = 6;
+import {usePlayContext} from "../components/PlayContext";
 
 export default function PlayGame() {
+    const {solution, setSolution, wordLength, maxGuesses} = usePlayContext();
     const styles = useThemeStyles();
     const navigation = useNavigation();
     const [guesses, setGuesses] = useState([]);
     const [currentGuess, setCurrentGuess] = useState("");
-    const [solution, setSolution] = useState("");
     const [message, setMessage] = useState("");
     const [win, setWin] = useState(false);
     const [showGameEndPopup, setShowGameEndPopup] = useState(false);
     const [showResetPopup, setShowResetPopup] = useState(false);
-
-    useEffect(() => {
-        setSolution(getRandom5LetterWord().toUpperCase());
-    }, []);
 
     const keyboardRows = [
         ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
@@ -34,7 +27,7 @@ export default function PlayGame() {
     ];
 
     const handleKeyPress = (letter) => {
-        if (currentGuess.length < WORD_LENGTH) {
+        if (currentGuess.length < wordLength) {
             setCurrentGuess((prev) => prev + letter);
         }
     };
@@ -44,7 +37,7 @@ export default function PlayGame() {
     };
 
     const handleSubmit = () => {
-        if (currentGuess.length === WORD_LENGTH && guesses.length < MAX_TRIES) {
+        if (currentGuess.length === wordLength && guesses.length < maxGuesses) {
             if (!isValid5LetterWord(currentGuess)) {
                 setMessage("Not in word list.");
                 return;
@@ -56,7 +49,7 @@ export default function PlayGame() {
             }
             setCurrentGuess("");
         }
-        if (guesses.length >= MAX_TRIES -1 && currentGuess !== solution) {
+        if (guesses.length >= maxGuesses -1 && currentGuess !== solution) {
             setWin(false);
             setShowGameEndPopup(true);
         }
@@ -72,7 +65,7 @@ export default function PlayGame() {
     const handleReset = () => {
         setGuesses([]);
         setCurrentGuess("");
-        setSolution(getRandom5LetterWord().toUpperCase());
+        setSolution(getRandom5LetterWord().toUpperCase()); //TODO: adjust for word length & difficulty
         setWin(false);
         setShowGameEndPopup(false);
     };
@@ -221,11 +214,11 @@ export default function PlayGame() {
 
             {/* Guess Grid */}
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                {Array.from({ length: MAX_TRIES }).map((_, rowIndex) => {
+                {Array.from({ length: maxGuesses }).map((_, rowIndex) => {
                     const guess = guesses[rowIndex] || (rowIndex === guesses.length ? currentGuess : "");
                     return (
                         <View key={rowIndex} style={{ flexDirection: "row", marginBottom: 6 }}>
-                            {Array.from({ length: WORD_LENGTH }).map((_, colIndex) => {
+                            {Array.from({ length: wordLength }).map((_, colIndex) => {
                                 const letter = guess[colIndex] || "";
                                 if (rowIndex < guesses.length) { // Previous guesses
                                     return previousGuessGridSquare(colIndex, letter);
